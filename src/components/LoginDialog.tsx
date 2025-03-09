@@ -57,6 +57,7 @@ export function LoginDialog() {
       setIsLoading(true);
       
       // Send request to your backend
+      // add service base etc..
       const response = await fetch('http://localhost:3000/users/login', {
         method: 'POST',
         headers: {
@@ -103,7 +104,7 @@ export function LoginDialog() {
       console.error('Login error:', error);
       const errorMessage = error instanceof Error ? error.message : "Failed to login";
       setLoginError(errorMessage);
-         toast.error("Login Failed", {
+      toast.error("Login Failed", {
         description: errorMessage,
       });
     } finally {
