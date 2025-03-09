@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import "../styles/global.css";
 import { ModeToggle } from "@/components/ModeToggle";
 import { LoginDialog } from "@/components/LoginDialog";
+import { Toaster } from "@/components/ui/sonner";
 ---
 
 <!doctype html>
@@ -32,6 +33,7 @@ import { LoginDialog } from "@/components/LoginDialog";
       </header>
       <slot />
     </div>
+    <Toaster client:load />
   </body>
 </html>
 <style is:global></style>
