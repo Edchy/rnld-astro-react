@@ -1,68 +1,49 @@
-
-import { useEffect, useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { LoginDialog } from './LoginDialog';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from './ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { toast } from 'sonner';
-import { SquareUserRound} from "lucide-react"
-
 
 export default function UserMenu() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
-
-
-
-  const handleLoginSuccess = (userData: any) => {
-  setIsLoggedIn(true);
-  setUsername(userData.username);
-  localStorage.setItem('userData', JSON.stringify(userData));
-
- 
-};
-const handleLogout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('userData');
-  setIsLoggedIn(false);
-  setUsername("");
-  toast.success("Logged out successfully");
-};
+  // Get authentication state and functions from context
+  const { user, isLoggedIn, logout } = useAuth();
   
-  useEffect(() => {
-    // Check if user is logged in on component mount
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('userData');
-    if (token && userData) {
-      setIsLoggedIn(true);
-      setUsername(JSON.parse(userData).username);
-    }
-  }, []);
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+  };
   
+  // When not logged in, show login dialog component directly
   if (!isLoggedIn) {
-    return <LoginDialog onLoginSuccess={handleLoginSuccess} />;
+    return <LoginDialog />;
   }
   
+  // When logged in, show user avatar and dropdown
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
           <Avatar>
-            <AvatarImage src="" alt={username} />
+            <AvatarImage src="" alt={user?.username} />
             <AvatarFallback>
-              {/* <SquareUserRound className='h-12 w-12'/> */}
-              {username.slice(0, 2).toUpperCase()}
+              {user?.username?.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem className="font-medium">
+          Signed in as {user?.username}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem>Profile</DropdownMenuItem>
         <DropdownMenuItem>Settings</DropdownMenuItem>
         <DropdownMenuSeparator />

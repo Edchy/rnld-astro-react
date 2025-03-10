@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-// todo
-// add sonner, real-time validation, and error handling, auth context, view transition, replace token with cookie, service base etc..
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,16 +22,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner"
-import { login } from "@/lib/services/userService"; 
-
-
+import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 // Define form schema with validation
 const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 15;
 const PASSWORD_MIN_LENGTH = 6;
-
 
 const formSchema = z.object({
   username: z.string()
@@ -42,14 +37,16 @@ const formSchema = z.object({
     .transform(val => val.toLowerCase()),
   password: z.string()
     .min(PASSWORD_MIN_LENGTH, { message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters` })
-    
 });
 
-export function LoginDialog({onLoginSuccess}: any) {
+export function LoginDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginSuccess, setLoginSuccess] = useState<string | null>(null);
+  
+  // Use auth context instead of props
+  const { login } = useAuth();
 
   // Initialize form with validation
   const form = useForm<z.infer<typeof formSchema>>({
@@ -62,61 +59,45 @@ export function LoginDialog({onLoginSuccess}: any) {
 
   // Handle form submission
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-      // Reset messages
+    // Reset messages
     setLoginError(null);
     setLoginSuccess(null);
+    
     try {
       setIsLoading(true);
       
-  
-
-    const response = await fetch('http://localhost:3000/users/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(values),
-    });
+      const response = await fetch('http://localhost:3000/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
       
       const data = await response.json();
-      console.log(data)
+      console.log("Login response:", data);
       
       if (!response.ok) {
         throw new Error(data.message || 'Failed to login');
       }
-      // const data = await login(values);
 
       // Success handling
       setLoginSuccess(data.message); // "Login successful"
       toast.success("Welcome!", {
         description: data.message || "You've been logged in successfully.",
-     
-    });
-      console.log("Logged in user:", data.user); // User data from backend
-
-     // TODO: remove this maybe
-      // localStorage.setItem('userData', JSON.stringify(data.user));
-
-      // Call the onLoginSuccess callback from UserMenu if provided
-      if (onLoginSuccess && data.user) {
-        onLoginSuccess(data.user);
-      }
-
+      });
       
-      // You might want to use a more robust auth state management like React Context
-      // For example: authContext.login(data.user, data.token);
-      
-       // Store the token/user data if needed
+      // Store the token if needed
       if (data.token) {
         localStorage.setItem('token', data.token);
       }
       
+      // Use the login function from Auth context
+      login(data.user);
+      
       // Close the dialog after a brief delay to show success message
       setTimeout(() => {
         setIsOpen(false);
-        
-        // Optional: Refresh the page or update UI
-        // window.location.reload();
       }, 1500);
       
     } catch (error) {
@@ -155,7 +136,7 @@ export function LoginDialog({onLoginSuccess}: any) {
           </DialogDescription>
         </DialogHeader>
 
-          {/* Display error message from backend */}
+        {/* Display error message from backend */}
         {loginError && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{loginError}</AlertDescription>
@@ -199,7 +180,7 @@ export function LoginDialog({onLoginSuccess}: any) {
               )}
             />
             
-             <DialogFooter className="pt-4">
+            <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={isLoading}>
                 Cancel
               </Button>

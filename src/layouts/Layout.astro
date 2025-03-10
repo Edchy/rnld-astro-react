@@ -5,6 +5,7 @@ import { ModeToggle } from "@/components/ModeToggle";
 import { LoginDialog } from "@/components/LoginDialog";
 import UserMenu from "@/components/UserMenu";
 import { Toaster } from "@/components/ui/sonner";
+import { AppShell } from "@/components/AppShell";
 ---
 
 <!doctype html>
@@ -21,21 +22,9 @@ import { Toaster } from "@/components/ui/sonner";
     <title>Arnold</title>
   </head>
   <body>
-    <div class="container mx-auto">
-      <header
-        class="muted-foreground py-4 flex justify-between items-center border-b-2"
-      >
-        <h1 class="text-2xl">
-          <a href="/">Arnold</a>
-        </h1>
-        <nav class="flex items-center gap-3">
-          <ModeToggle client:load />
-          <UserMenu client:load />
-        </nav>
-      </header>
+    <AppShell client:load>
       <slot />
-    </div>
-    <Toaster richColors client:load />
+    </AppShell>
   </body>
 </html>
 <style is:global></style>
