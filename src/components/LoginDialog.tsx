@@ -24,6 +24,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { login as loginApi } from '@/lib/services/userService';
+
 
 // Define form schema with validation
 const USERNAME_MIN_LENGTH = 2;
@@ -66,20 +68,22 @@ export function LoginDialog() {
     try {
       setIsLoading(true);
       
-      const response = await fetch('http://localhost:3000/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
+      // const response = await fetch('http://localhost:3000/users/login', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(values),
+      // });
       
-      const data = await response.json();
-      console.log("Login response:", data);
+      // const data = await response.json();
+      // console.log("Login response:", data);
       
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to login');
-      }
+      // if (!response.ok) {
+      //   throw new Error(data.message || 'Failed to login');
+      // }
+
+      const data = await loginApi(values);
 
       // Success handling
       setLoginSuccess(data.message); // "Login successful"

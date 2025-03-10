@@ -1,60 +1,56 @@
 import { api } from "./apiService";
 
-export interface Workout {
-  id: string;
-  name: string;
-  date: string;
-  duration: number;
-  exercises: Exercise[];
-  userId: string;
-  // Add other fields as needed
-}
-
 export interface Exercise {
-  id: string;
   name: string;
   sets: number;
   reps: number;
   weight: number;
-  // Add other fields as needed
+}
+
+export interface Workout {
+  _id: string;
+  name: string;
+  exercises: Exercise[];
 }
 
 /**
- * Get all workouts for the logged-in user
+ * Get workouts for a specific user
  */
-export async function getUserWorkouts(): Promise<Workout[]> {
-  return api.get<Workout[]>("/workouts");
+export async function getUserWorkouts(username: string): Promise<Workout[]> {
+  return api.get<Workout[]>(`/users/${username}/workouts`);
 }
 
 /**
  * Get a specific workout by ID
  */
-export async function getWorkout(id: string): Promise<Workout> {
-  return api.get<Workout>(`/workouts/${id}`);
+export async function getWorkout(workoutId: string): Promise<Workout> {
+  return api.get<Workout>(`/workouts/${workoutId}`);
 }
 
 /**
  * Create a new workout
  */
 export async function createWorkout(
-  workout: Omit<Workout, "id">
+  workoutData: Omit<Workout, "_id">
 ): Promise<Workout> {
-  return api.post<Workout>("/workouts", workout);
+  return api.post<Workout>("/workouts", workoutData);
 }
 
 /**
  * Update an existing workout
  */
 export async function updateWorkout(
-  id: string,
-  workout: Partial<Workout>
+  workoutId: string,
+  workoutData: Partial<Workout>
 ): Promise<Workout> {
-  return api.put<Workout>(`/workouts/${id}`, workout);
+  return api.put<Workout>(`/workouts/${workoutId}`, workoutData);
 }
 
 /**
  * Delete a workout
  */
-export async function deleteWorkout(id: string): Promise<void> {
-  return api.delete(`/workouts/${id}`);
+export async function deleteWorkout(
+  workoutId: string
+): Promise<{ message: string }> {
+  return api.delete<{ message: string }>(`/workouts/${workoutId}`);
 }

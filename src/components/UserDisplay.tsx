@@ -1,5 +1,8 @@
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
+import { getUserWorkouts } from '@/lib/services/workoutService';
+import type { Workout, Exercise} from '@/lib/services/workoutService';
+
 import {
   Accordion,
   AccordionContent,
@@ -10,12 +13,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Define a type for the workout data
-interface Workout {
-  _id: string;
-  name: string;
-  exercises: any[];
-  // Add any other fields your workout has
-}
+// interface Workout {
+//   _id: string;
+//   name: string;
+//   exercises: any[];
+// }
 
 export function UserDisplay() {
   const { user, isLoggedIn } = useAuth();
@@ -32,25 +34,10 @@ export function UserDisplay() {
       setIsLoading(true);
       setError(null);
       
-      try {
-        // Make the request to your API endpoint
-        const response = await fetch(`http://localhost:3000/users/${user.username}/workouts`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        
-        // Check if request was successful
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to fetch workouts');
-        }
-        
-        // Parse and store the workout data
-        const workoutData = await response.json();
-        console.log(workoutData)
+       try {
+        // Use the service instead of direct fetch
+        const workoutData = await getUserWorkouts(user.username);
+        console.log('Workouts retrieved:', workoutData);
         setWorkouts(workoutData);
       } catch (err) {
         console.error('Error fetching workouts:', err);
@@ -106,7 +93,7 @@ export function UserDisplay() {
                   {workout.exercises && workout.exercises.length > 0 ? (
                     <div className="space-y-3 pt-2">
                       {workout.exercises.map((exercise, index) => (
-                        <div key={exercise._id || index} className="bg-muted/50 p-3 rounded-md">
+                        <div key={index || index} className="bg-muted/50 p-3 rounded-md">
                           <h4 className="font-medium text-sm">{exercise.name}</h4>
                           <div className="grid grid-cols-3 gap-2 mt-2 text-xs text-muted-foreground">
                             <div className="flex flex-col">
