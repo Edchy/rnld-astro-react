@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 // todo
-// add sonner, real-time validation, and error handling, auth context,
+// add sonner, real-time validation, and error handling, auth context, view transition, replace token with cookie, service base etc..
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,15 +25,27 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner"
+import { login } from "@/lib/services/userService"; 
+
 
 
 // Define form schema with validation
+const USERNAME_MIN_LENGTH = 2;
+const USERNAME_MAX_LENGTH = 15;
+const PASSWORD_MIN_LENGTH = 6;
+
+
 const formSchema = z.object({
-  username: z.string().min(2, { message: "Username must be at least 2 characters" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  username: z.string()
+    .min(USERNAME_MIN_LENGTH, { message: `Username must be at least ${USERNAME_MIN_LENGTH} characters` })
+    .max(USERNAME_MAX_LENGTH, { message: `Username cannot be more than ${USERNAME_MAX_LENGTH} characters` })
+    .transform(val => val.toLowerCase()),
+  password: z.string()
+    .min(PASSWORD_MIN_LENGTH, { message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters` })
+    
 });
 
-export function LoginDialog() {
+export function LoginDialog({onLoginSuccess}: any) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -56,15 +68,15 @@ export function LoginDialog() {
     try {
       setIsLoading(true);
       
-      // Send request to your backend
-      // add service base etc..
-      const response = await fetch('http://localhost:3000/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
+  
+
+    const response = await fetch('http://localhost:3000/users/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(values),
+    });
       
       const data = await response.json();
       console.log(data)
@@ -72,15 +84,23 @@ export function LoginDialog() {
       if (!response.ok) {
         throw new Error(data.message || 'Failed to login');
       }
-      
+      // const data = await login(values);
+
       // Success handling
       setLoginSuccess(data.message); // "Login successful"
       toast.success("Welcome!", {
-      description: data.message || "You've been logged in successfully.",
+        description: data.message || "You've been logged in successfully.",
      
     });
       console.log("Logged in user:", data.user); // User data from backend
-     
+
+     // TODO: remove this maybe
+      // localStorage.setItem('userData', JSON.stringify(data.user));
+
+      // Call the onLoginSuccess callback from UserMenu if provided
+      if (onLoginSuccess && data.user) {
+        onLoginSuccess(data.user);
+      }
 
       
       // You might want to use a more robust auth state management like React Context

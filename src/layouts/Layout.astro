@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import "../styles/global.css";
 import { ModeToggle } from "@/components/ModeToggle";
 import { LoginDialog } from "@/components/LoginDialog";
+import UserMenu from "@/components/UserMenu";
 import { Toaster } from "@/components/ui/sonner";
 ---
 
@@ -20,15 +21,16 @@ import { Toaster } from "@/components/ui/sonner";
     <title>Arnold</title>
   </head>
   <body>
-    <div class="container mx-auto px-4 h-screen">
+    <div class="container mx-auto">
       <header
-        class="bg-primary-foreground p-4 flex justify-between items-center"
+        class="muted-foreground py-4 flex justify-between items-center border-b-2"
       >
-        <h1 class="text-2xl">Arnold</h1>
+        <h1 class="text-2xl">
+          <a href="/">Arnold</a>
+        </h1>
         <nav class="flex items-center gap-3">
-          <!-- <Button>Account</Button> -->
-          <LoginDialog client:load />
           <ModeToggle client:load />
+          <UserMenu client:load />
         </nav>
       </header>
       <slot />
