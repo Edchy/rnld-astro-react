@@ -24,15 +24,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
-import { login as loginApi } from '@/lib/services/userService';
-
+import { login as loginApi, register as registerApi } from '@/lib/services/userService';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Define form schema with validation
 const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 15;
 const PASSWORD_MIN_LENGTH = 6;
 
-const formSchema = z.object({
+const loginFormSchema = z.object({
   username: z.string()
     .min(USERNAME_MIN_LENGTH, { message: `Username must be at least ${USERNAME_MIN_LENGTH} characters` })
     .max(USERNAME_MAX_LENGTH, { message: `Username cannot be more than ${USERNAME_MAX_LENGTH} characters` })
@@ -41,52 +41,62 @@ const formSchema = z.object({
     .min(PASSWORD_MIN_LENGTH, { message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters` })
 });
 
+const registerFormSchema = z.object({
+  username: z.string()
+    .min(USERNAME_MIN_LENGTH, { message: `Username must be at least ${USERNAME_MIN_LENGTH} characters` })
+    .max(USERNAME_MAX_LENGTH, { message: `Username cannot be more than ${USERNAME_MAX_LENGTH} characters` })
+    .transform(val => val.toLowerCase()),
+  password: z.string()
+    .min(PASSWORD_MIN_LENGTH, { message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters` }),
+  confirmPassword: z.string()
+    .min(PASSWORD_MIN_LENGTH, { message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters` }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 export function LoginDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [loginError, setLoginError] = useState<string | null>(null);
-  const [loginSuccess, setLoginSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   
-  // Use auth context instead of props
+  // Use auth context
   const { login } = useAuth();
 
-  // Initialize form with validation
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  // Initialize login form with validation
+  const loginForm = useForm<z.infer<typeof loginFormSchema>>({
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       username: "",
       password: "",
     },
   });
 
-  // Handle form submission
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  // Initialize register form with validation
+  const registerForm = useForm<z.infer<typeof registerFormSchema>>({
+    resolver: zodResolver(registerFormSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  // Handle login form submission
+  const onLoginSubmit = async (values: z.infer<typeof loginFormSchema>) => {
     // Reset messages
-    setLoginError(null);
-    setLoginSuccess(null);
+    setError(null);
+    setSuccess(null);
     
     try {
       setIsLoading(true);
       
-      // const response = await fetch('http://localhost:3000/users/login', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(values),
-      // });
-      
-      // const data = await response.json();
-      // console.log("Login response:", data);
-      
-      // if (!response.ok) {
-      //   throw new Error(data.message || 'Failed to login');
-      // }
-
       const data = await loginApi(values);
 
       // Success handling
-      setLoginSuccess(data.message); // "Login successful"
+      setSuccess(data.message); 
       toast.success("Welcome!", {
         description: data.message || "You've been logged in successfully.",
       });
@@ -108,7 +118,7 @@ export function LoginDialog() {
       // Error handling - display the message from backend
       console.error('Login error:', error);
       const errorMessage = error instanceof Error ? error.message : "Failed to login";
-      setLoginError(errorMessage);
+      setError(errorMessage);
       toast.error("Login Failed", {
         description: errorMessage,
       });
@@ -117,14 +127,59 @@ export function LoginDialog() {
     }
   };
 
-  // Reset form when dialog closes
+  // Handle register form submission
+  const onRegisterSubmit = async (values: z.infer<typeof registerFormSchema>) => {
+    // Reset messages
+    setError(null);
+    setSuccess(null);
+    
+    try {
+      setIsLoading(true);
+      
+      // Remove the confirmPassword field before sending to API
+      const { confirmPassword, ...registerData } = values;
+      
+      const data = await registerApi(registerData);
+
+      // Success handling
+      setSuccess(data.message || "Registration successful"); 
+      toast.success("Account Created!", {
+        description: "Your account has been created successfully. You can now log in.",
+      });
+      
+      // Switch to login tab after successful registration
+      setActiveTab("login");
+      loginForm.setValue("username", values.username);
+      
+    } catch (error) {
+      // Error handling - display the message from backend
+      console.error('Registration error:', error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to register";
+      setError(errorMessage);
+      toast.error("Registration Failed", {
+        description: errorMessage,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reset forms when dialog closes
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      form.reset();
-      setLoginError(null);
-      setLoginSuccess(null);
+      loginForm.reset();
+      registerForm.reset();
+      setError(null);
+      setSuccess(null);
     }
     setIsOpen(open);
+  };
+
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as "login" | "register");
+    setError(null);
+    setSuccess(null);
   };
 
   return (
@@ -134,66 +189,139 @@ export function LoginDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Login</DialogTitle>
+          <DialogTitle>Account Access</DialogTitle>
           <DialogDescription>
-            Enter your credentials to access your account.
+            Login to your account or create a new one.
           </DialogDescription>
         </DialogHeader>
 
         {/* Display error message from backend */}
-        {loginError && (
+        {error && (
           <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{loginError}</AlertDescription>
+            <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
         
         {/* Display success message from backend */}
-        {loginSuccess && (
+        {success && (
           <Alert variant="default" className="mb-4 bg-green-50 text-green-800 border-green-200">
-            <AlertDescription>{loginSuccess}</AlertDescription>
+            <AlertDescription>{success}</AlertDescription>
           </Alert>
         )}
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="your_username" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <DialogFooter className="pt-4">
-              <Button type="button" variant="outline" onClick={() => handleOpenChange(false)} disabled={isLoading}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+          <Tabs 
+          value={activeTab} 
+          onValueChange={handleTabChange} 
+          className="w-full"
+          defaultValue="login" // Add a default value
+          >
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger 
+            value="login" 
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          >
+            Login
+          </TabsTrigger>
+          <TabsTrigger 
+            value="register"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          >
+            Register
+          </TabsTrigger>
+        </TabsList>
+          
+          {/* Login Form */}
+          <TabsContent value="login">
+            <Form {...loginForm}>
+              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4 py-4">
+                <FormField
+                  control={loginForm.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Username</FormLabel>
+                      <FormControl>
+                        <Input placeholder="your_username" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={loginForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Login"}
+                </Button>
+              </form>
+            </Form>
+          </TabsContent>
+          
+          {/* Register Form */}
+          <TabsContent value="register">
+            <Form {...registerForm}>
+              <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4 py-4">
+                <FormField
+                  control={registerForm.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Username</FormLabel>
+                      <FormControl>
+                        <Input placeholder="choose_username" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={registerForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={registerForm.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Creating Account..." : "Register"}
+                </Button>
+              </form>
+            </Form>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

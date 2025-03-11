@@ -5,6 +5,11 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface RegisterCredentials {
+  username: string;
+  password: string;
+}
+
 export interface UserResponse {
   message: string;
   user: {
@@ -19,4 +24,10 @@ export async function login(
   credentials: LoginCredentials
 ): Promise<UserResponse> {
   return api.post<UserResponse>("/users/login", credentials);
+}
+
+export async function register(
+  credentials: RegisterCredentials
+): Promise<UserResponse> {
+  return api.post<UserResponse>("/users", credentials);
 }
