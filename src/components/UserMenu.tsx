@@ -1,5 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
-import { LoginDialog } from './LoginDialog';
+// import { LoginDialog } from './LoginDialog';
+import { AccountDialog } from './auth/AccountDialog';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from './ui/button';
 import {
@@ -23,7 +24,7 @@ export default function UserMenu() {
   
   // When not logged in, show login dialog component directly
   if (!isLoggedIn) {
-    return <LoginDialog />;
+    return <AccountDialog />;
   }
   
   // When logged in, show user avatar and dropdown
