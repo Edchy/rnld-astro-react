@@ -1,3 +1,5 @@
+import { useAuth } from "../../context/AuthContext"; // Adjust the import path as needed
+
 const API_BASE_URL = "http://localhost:3000";
 
 // Default request options
@@ -41,6 +43,12 @@ export async function apiRequest<T>(
 
     // Handle API error responses
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        // Token is invalid or expired
+        throw new Error(
+          "Unauthorized: Token is invalid or expired. Try logging in again."
+        );
+      }
       throw new Error(data.message || `API error: ${response.status}`);
     }
 

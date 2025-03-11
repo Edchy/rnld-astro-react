@@ -1,16 +1,29 @@
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
-import { getUserWorkouts } from '@/lib/services/workoutService';
+import { getUserWorkouts, deleteWorkout } from '@/lib/services/workoutService';
 import type { Workout, Exercise} from '@/lib/services/workoutService';
-
+import {toast} from 'sonner';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { TrashIcon } from 'lucide-react';
+import { Button } from './ui/button';
 
 // Define a type for the workout data
 // interface Workout {
@@ -24,36 +37,70 @@ export function UserDisplay() {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const [isDeleting, setIsDeleting] = useState(false);
+  const {logout} = useAuth();
+
   // Fetch workouts when the component mounts or user changes
-  useEffect(() => {
-    const fetchWorkouts = async () => {
-      // Only fetch if user is logged in
-      if (!isLoggedIn || !user) return;
-      
-      setIsLoading(true);
-      setError(null);
-      
-       try {
-        // Use the service instead of direct fetch
-        const workoutData = await getUserWorkouts(user.username);
-        console.log('Workouts retrieved:', workoutData);
-        setWorkouts(workoutData);
-      } catch (err) {
-        console.error('Error fetching workouts:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch workouts');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchWorkouts = async () => {
+    if (!isLoggedIn || !user) return;
     
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const workoutData = await getUserWorkouts(user.username);
+      setWorkouts(workoutData);
+    } catch (err) {
+      console.error('Error fetching workouts:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch workouts');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  useEffect(() => {
     fetchWorkouts();
   }, [user, isLoggedIn]);
+
+    // Handle workout deletion
+  const handleDeleteWorkout = async (workoutId: string, workoutName: string) => {
+    setIsDeleting(true);
+    try {
+      // call to backend
+      await deleteWorkout(workoutId);
+      
+      // Update local state after successful deletion
+      // setWorkouts(prevWorkouts => prevWorkouts.filter(w => w._id !== workoutId));
+      
+      toast.success(`Workout deleted`, {
+        description: `"${workoutName}" was successfully removed.`
+      });
+    } catch (error) {
+      console.log((error as Error).message);
+
+      if (((error as Error).message).includes('Unauthorized') || ((error as Error).message).includes('403')) {
+        console.log("Unauthorized logging out...");
+        logout();
+      }
+      console.error('Error deleting workout:', error);
+      toast.error(`Failed to delete workout`, {
+        description: error instanceof Error ? error.message : 'An unknown error occurred'
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
   
   // If not logged in, show nothing or a message
   if (!isLoggedIn || !user) {
     return <p>Please log in to see your workouts</p>;
   }
+
+
+  /// kanske....
+  // if(error) {
+  //   logout();
+  // }
   
   return (
     <Card>
@@ -78,17 +125,50 @@ export function UserDisplay() {
         )}
         
         {!isLoading && !error && workouts.length > 0 && (
-          <Accordion type="single" collapsible className="w-full">
-            {workouts.map((workout) => (
+          <Accordion type="single" collapsible className="w-full mx-4">
+           {workouts.map((workout) => (
               <AccordionItem value={workout._id} key={workout._id}>
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center justify-between w-full pr-4">
-                    <span className="font-medium">{workout.name}</span>
-                    <Badge variant="outline" className="ml-2">
-                      {workout.exercises?.length || 0} exercises
-                    </Badge>
-                  </div>
-                </AccordionTrigger>
+                <div className="flex items-center justify-between">
+                  <AccordionTrigger className="flex-1 hover:no-underline">
+                    <div className="flex items-center justify-between w-full pr-4">
+                      <span className="font-medium">{workout.name}</span>
+                      <Badge variant="outline" className="ml-2">
+                        {workout.exercises?.length || 0} exercises
+                      </Badge>
+                    </div>
+                  </AccordionTrigger>
+                  
+                  {/* Delete workout button with confirmation */}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="text-muted-foreground hover:text-destructive"
+                        disabled={isDeleting}
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Workout</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete "{workout.name}"? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleDeleteWorkout(workout._id, workout.name)}
+                          className="bg-destructive text-white hover:bg-destructive/90"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
                 <AccordionContent>
                   {workout.exercises && workout.exercises.length > 0 ? (
                     <div className="space-y-3 pt-2">

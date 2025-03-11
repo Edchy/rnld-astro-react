@@ -8,9 +8,9 @@ import { UserDisplay } from "@/components/UserDisplay";
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
-        <header className="muted-foreground py-4 flex justify-between items-center border-b-2">
+        <header className="muted-foreground p-4 flex justify-between items-center">
           <h1 className="text-2xl">
-            <a href="/">Arnold</a>
+            <a href="/">RNLD</a>
           </h1>
           <nav className="flex items-center gap-3">
             <ModeToggle />

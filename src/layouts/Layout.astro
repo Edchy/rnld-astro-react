@@ -21,14 +21,17 @@ import { AppShell } from "@/components/AppShell";
     <meta name="generator" content={Astro.generator} />
     <title>Arnold</title>
   </head>
-  <body class="h-screen">
+  <body class="min-h-screen">
     <div class="container mx-auto">
       <AppShell client:load>
         <slot />
       </AppShell>
-
+      <slot name="main" />
       <Toaster richColors client:load />
     </div>
+    <footer class="bg-purple-400 text-white p-4 text-center text-9xl">
+      footer
+    </footer>
   </body>
   <script>
     console.log("Hello from Layout.astro");
