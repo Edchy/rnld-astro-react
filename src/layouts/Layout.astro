@@ -22,15 +22,15 @@ import { AppShell } from "@/components/AppShell";
     <title>Arnold</title>
   </head>
   <body class="min-h-screen">
-    <div class="container mx-auto">
+    <div class="container mx-auto min-h-screen">
       <AppShell client:load>
         <slot />
       </AppShell>
       <slot name="main" />
       <Toaster richColors client:load />
     </div>
-    <footer class="bg-purple-400 text-white p-4 text-center text-9xl">
-      footer
+    <footer class="bg-primary text-white p-4 text-center text-9xl">
+      <h2>Arnold</h2>
     </footer>
   </body>
   <script>

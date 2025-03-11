@@ -49,6 +49,7 @@ export function UserDisplay() {
     
     try {
       const workoutData = await getUserWorkouts(user.username);
+      console.log("Workout data:", workoutData);
       setWorkouts(workoutData);
     } catch (err) {
       console.error('Error fetching workouts:', err);
@@ -70,17 +71,21 @@ export function UserDisplay() {
       await deleteWorkout(workoutId);
       
       // Update local state after successful deletion
-      // setWorkouts(prevWorkouts => prevWorkouts.filter(w => w._id !== workoutId));
+      setWorkouts(prevWorkouts => prevWorkouts.filter(w => w._id !== workoutId));
       
       toast.success(`Workout deleted`, {
-        description: `"${workoutName}" was successfully removed.`
+        description: `"${workoutName}" was successfully removed.`,
+          action: {
+          label: 'Undo',
+          onClick: () => alert('You cant! 😈'),
+  },
       });
     } catch (error) {
       console.log((error as Error).message);
 
       if (((error as Error).message).includes('Unauthorized') || ((error as Error).message).includes('403')) {
         console.log("Unauthorized logging out...");
-        logout();
+        logout(); // useAuth
       }
       console.error('Error deleting workout:', error);
       toast.error(`Failed to delete workout`, {
@@ -93,7 +98,12 @@ export function UserDisplay() {
   
   // If not logged in, show nothing or a message
   if (!isLoggedIn || !user) {
-    return <p>Please log in to see your workouts</p>;
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+      {/* <Button>Register</Button> */}
+      <p>hey...</p>
+      </div>
+    );
   }
 
 
@@ -108,7 +118,9 @@ export function UserDisplay() {
         <CardTitle className="text-xl">
           Hello, <span className="font-bold">{user.username}</span>!
         </CardTitle>
-        <CardDescription>Welcome to Arnold. Here are your workouts:</CardDescription>
+        <CardDescription>
+          Welcome to Arnold. {workouts.length === 0 ? "Add some workouts and start tracking 💪🏋️" : "Here are your workouts:"}
+        </CardDescription>
       </CardHeader>
       
       <CardContent>
@@ -121,7 +133,9 @@ export function UserDisplay() {
         )}
         
         {!isLoading && !error && workouts.length === 0 && (
-          <p className="text-muted-foreground">You don't have any workouts yet.</p>
+         
+            <Button className="mt-4">Create a new workout</Button>
+         
         )}
         
         {!isLoading && !error && workouts.length > 0 && (
