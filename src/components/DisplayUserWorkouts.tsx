@@ -1,6 +1,8 @@
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import { getUserWorkouts, deleteWorkout } from '@/lib/services/workoutService';
+import { WorkoutFormDialog } from './WorkoutFormDialog';
+
 import type { Workout, Exercise } from '@/lib/services/workoutService';
 import { toast } from 'sonner';
 import {
@@ -25,19 +27,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { TrashIcon } from 'lucide-react';
 import { Button } from './ui/button';
 
-// Define a type for the workout data
-// interface Workout {
-//   _id: string;
-//   name: string;
-//   exercises: any[];
-// }
-
-export function UserDisplay() {
+export function DisplayUserWorkouts() {
   const { user, isLoggedIn } = useAuth();
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const [isNewWorkoutDialogOpen, setIsNewWorkoutDialogOpen] = useState(false);
+
   const { logout } = useAuth();
   const { weightUnit } = useAuth();
 
@@ -63,6 +61,11 @@ export function UserDisplay() {
   useEffect(() => {
     fetchWorkouts();
   }, [user, isLoggedIn]);
+
+  // Handle opening the workout form
+  const handleNewWorkoutClick = () => {
+    setIsNewWorkoutDialogOpen(true);
+  };
 
   // Handle workout deletion
   const handleDeleteWorkout = async (workoutId: string, workoutName: string) => {
@@ -117,18 +120,23 @@ export function UserDisplay() {
 
   return (
     <>
-      <div className="text-l mt-20">
+      <div className="text-l mt-10">
         Hello{' '}
         <span className="font-bold">
           {user.username.charAt(0).toUpperCase() + user.username.slice(1)}
         </span>
         , you absolute beast! You look fucking good today!
       </div>
-      <p>
-        {workouts.length === 0
-          ? 'Add some workouts and start tracking 💪🏋️'
-          : 'Here are your workouts:'}
-      </p>
+      <div className="flex justify-between items-center py-2 mt-10">
+        <p>
+          {workouts.length === 0
+            ? 'Add some workouts and start tracking 💪🏋️'
+            : 'Here are your workouts:'}
+        </p>
+        <Button variant={'outline'} onClick={handleNewWorkoutClick}>
+          New workout
+        </Button>
+      </div>
       <Card>
         {/* <CardHeader>
         <CardTitle>Your Workouts</CardTitle>
@@ -224,6 +232,11 @@ export function UserDisplay() {
           )}
         </CardContent>
       </Card>
+      <WorkoutFormDialog
+        open={isNewWorkoutDialogOpen}
+        onOpenChange={setIsNewWorkoutDialogOpen}
+        onWorkoutCreated={fetchWorkouts} // Refresh workouts after creation
+      />
     </>
   );
 }

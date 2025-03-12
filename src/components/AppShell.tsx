@@ -2,13 +2,13 @@ import { AuthProvider } from '@/context/AuthContext';
 import { ModeToggle } from './ModeToggle';
 import UserMenu from './UserMenu';
 import { Toaster } from './ui/sonner';
-import { UserDisplay } from '@/components/UserDisplay';
+import { DisplayUserWorkouts } from '@/components/DisplayUserWorkouts';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <header className="muted-foreground py-4 flex justify-between items-center">
-        <h1 className="text-2xl">
+        <h1 className="text-2xl brand-text">
           <a href="#">ARNOLD</a>
         </h1>
         <nav className="flex items-center gap-3">
@@ -16,7 +16,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <UserMenu />
         </nav>
       </header>
-      <UserDisplay />
+      <DisplayUserWorkouts />
 
       {children}
       {/* <Toaster richColors /> */}
