@@ -13,6 +13,16 @@ export interface Workout {
   exercises: Exercise[];
 }
 
+export interface WorkoutFormData {
+  name: string;
+  exercises: {
+    name: string;
+    sets: number;
+    reps: number;
+    weight: number;
+  }[];
+}
+
 /**
  * Get workouts for a specific user
  */
@@ -30,7 +40,7 @@ export async function getWorkout(workoutId: string): Promise<Workout> {
 /**
  * Create a new workout
  */
-export async function createWorkout(workoutData: Omit<Workout, '_id'>): Promise<Workout> {
+export async function createWorkout(workoutData: WorkoutFormData): Promise<Workout> {
   return api.post<Workout>('/workouts', workoutData);
 }
 
