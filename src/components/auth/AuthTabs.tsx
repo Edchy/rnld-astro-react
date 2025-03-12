@@ -21,6 +21,7 @@ export function AuthTabs({
   loginDefaultValues
 }: AuthTabsProps) {
   return (
+   <div className="min-h-[420px]">
     <Tabs 
       value={activeTab} 
       onValueChange={onTabChange} 
@@ -57,5 +58,6 @@ export function AuthTabs({
         />
       </TabsContent>
     </Tabs>
+  </div>
   );
 }

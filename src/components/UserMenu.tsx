@@ -1,6 +1,8 @@
 import { useAuth } from '@/context/AuthContext';
 // import { LoginDialog } from './LoginDialog';
-import { AccountDialog } from './auth/AccountDialog';
+import { AccountDialog } from '@/components/auth/AccountDialog';
+import { SettingsDialog } from '@/components/SettingsDialog';
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from './ui/button';
 import {
@@ -11,8 +13,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 export default function UserMenu() {
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   // Get authentication state and functions from context
   const { user, isLoggedIn, logout } = useAuth();
   
@@ -29,6 +34,7 @@ export default function UserMenu() {
   
   // When logged in, show user avatar and dropdown
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
@@ -46,10 +52,21 @@ export default function UserMenu() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuItem>Settings</DropdownMenuItem>
+         <DropdownMenuItem onClick={(e) => {
+            e.preventDefault();
+            setIsSettingsOpen(true);
+          }}>
+            Settings
+          </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+        {/* Settings Dialog */}
+      <SettingsDialog 
+        open={isSettingsOpen} 
+        onOpenChange={setIsSettingsOpen} 
+      />
+    </>
   );
 }

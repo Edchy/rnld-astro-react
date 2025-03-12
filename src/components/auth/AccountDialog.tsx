@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { act, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -113,6 +113,9 @@ export function AccountDialog() {
     setSuccess(null);
   };
 
+  const dialogTitle = activeTab === "login" ? "Welcome Back" : "Join Us";
+  const dialogDescription = activeTab === "login" ? "Please enter your credentials to access your account." : "Fill in the details to create a new account.";
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
@@ -120,9 +123,9 @@ export function AccountDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Account Access</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>
-            Login to your account or create a new one.
+            {dialogDescription}
           </DialogDescription>
         </DialogHeader>
 

@@ -40,13 +40,15 @@ export async function apiRequest<T>(
   try {
     const response = await fetch(url, config);
     const data = await response.json();
-
+    console.log(typeof data);
+    console.log(response.ok);
     // Handle API error responses
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         // Token is invalid or expired
         throw new Error(
-          "Unauthorized: Token is invalid or expired. Try logging in again."
+          data.message ||
+            "Unauthorized: Token is invalid or expired. Try logging in again."
         );
       }
       throw new Error(data.message || `API error: ${response.status}`);
