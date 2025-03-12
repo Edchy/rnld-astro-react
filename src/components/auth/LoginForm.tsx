@@ -1,7 +1,6 @@
-
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -9,10 +8,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { loginFormSchema } from "./schemas";
-import type { LoginFormValues } from "./schemas";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { loginFormSchema } from './schemas';
+import type { LoginFormValues } from './schemas';
 
 interface LoginFormProps {
   onSubmit: (values: LoginFormValues) => Promise<void>;
@@ -24,8 +23,8 @@ export function LoginForm({ onSubmit, isLoading, defaultValues }: LoginFormProps
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
-      username: defaultValues?.username || "",
-      password: "",
+      username: defaultValues?.username || '',
+      password: '',
     },
   });
 
@@ -45,7 +44,7 @@ export function LoginForm({ onSubmit, isLoading, defaultValues }: LoginFormProps
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="password"
@@ -59,9 +58,9 @@ export function LoginForm({ onSubmit, isLoading, defaultValues }: LoginFormProps
             </FormItem>
           )}
         />
-        
+
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Logging in..." : "Login"}
+          {isLoading ? 'Logging in...' : 'Login'}
         </Button>
       </form>
     </Form>

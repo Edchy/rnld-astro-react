@@ -1,4 +1,4 @@
-import { api } from "./apiService";
+import { api } from './apiService';
 
 export interface Exercise {
   name: string;
@@ -30,10 +30,8 @@ export async function getWorkout(workoutId: string): Promise<Workout> {
 /**
  * Create a new workout
  */
-export async function createWorkout(
-  workoutData: Omit<Workout, "_id">
-): Promise<Workout> {
-  return api.post<Workout>("/workouts", workoutData);
+export async function createWorkout(workoutData: Omit<Workout, '_id'>): Promise<Workout> {
+  return api.post<Workout>('/workouts', workoutData);
 }
 
 /**
@@ -49,8 +47,6 @@ export async function updateWorkout(
 /**
  * Delete a workout
  */
-export async function deleteWorkout(
-  workoutId: string
-): Promise<{ message: string }> {
+export async function deleteWorkout(workoutId: string): Promise<{ message: string }> {
   return api.delete<{ message: string }>(`/workouts/${workoutId}`);
 }

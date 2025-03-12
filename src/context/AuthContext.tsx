@@ -11,6 +11,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   login: (userData: User) => void;
   logout: () => void;
+  weightUnit: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,12 +19,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+  const [weightUnit, setWeightUnit] = useState('lbs');
+
   useEffect(() => {
     // Check if user is logged in on mount
     const userData = localStorage.getItem('userData');
     const token = localStorage.getItem('token');
-    
+
     if (userData && token) {
       try {
         const parsedUser = JSON.parse(userData);
@@ -34,22 +36,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, []);
-  
+
   const login = (userData: User) => {
     setUser(userData);
     setIsLoggedIn(true);
     localStorage.setItem('userData', JSON.stringify(userData));
   };
-  
+
   const logout = () => {
     setUser(null);
     setIsLoggedIn(false);
     localStorage.removeItem('userData');
     localStorage.removeItem('token');
   };
-  
+
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, login, logout, weightUnit }}>
       {children}
     </AuthContext.Provider>
   );

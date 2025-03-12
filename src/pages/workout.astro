@@ -1,11 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { UserDisplay } from '@/components/UserDisplay';
-import { AuthWrapper } from '@/components/AuthWrapper';
+import Swapy from '@/components/Swapy';
 ---
 
 <Layout>
   <p>inside AppShell</p>
+  <Swapy client:visible />
   <div slot="main">
     <p>outside AppShell</p>
   </div>

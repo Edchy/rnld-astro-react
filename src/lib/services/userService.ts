@@ -1,4 +1,4 @@
-import { api } from "./apiService";
+import { api } from './apiService';
 
 export interface LoginCredentials {
   username: string;
@@ -20,14 +20,14 @@ export interface UserResponse {
   token?: string;
 }
 
-export async function login(
-  credentials: LoginCredentials
-): Promise<UserResponse> {
-  return api.post<UserResponse>("/users/login", credentials);
+export async function login(credentials: LoginCredentials): Promise<UserResponse> {
+  return api.post<UserResponse>('/users/login', credentials);
 }
 
-export async function register(
-  credentials: RegisterCredentials
-): Promise<UserResponse> {
-  return api.post<UserResponse>("/users", credentials);
+export async function register(credentials: RegisterCredentials): Promise<UserResponse> {
+  return api.post<UserResponse>('/users', credentials);
+}
+
+export async function deleteAccount(): Promise<{ message: string }> {
+  return api.delete<{ message: string }>('/users');
 }

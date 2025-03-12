@@ -1,7 +1,7 @@
 ---
-import "../styles/global.css";
-import { Toaster } from "@/components/ui/sonner";
-import { AppShell } from "@/components/AppShell";
+import '../styles/global.css';
+import { Toaster } from '@/components/ui/sonner';
+import { AppShell } from '@/components/AppShell';
 ---
 
 <!doctype html>
@@ -25,36 +25,31 @@ import { AppShell } from "@/components/AppShell";
       <slot name="main" />
       <Toaster richColors client:load />
     </div>
-    <footer class="bg-primary text-white p-4 text-center text-9xl">
-      <h2>Arnold</h2>
+    <footer class="bg-primary text-background p-4 text-center text-9xl">
+      <h2 class="font-bold uppercase">Arnold</h2>
     </footer>
   </body>
   <script>
-    console.log("Hello from Layout.astro");
+    console.log('Hello from Layout.astro');
   </script>
   <script is:inline>
     const getThemePreference = () => {
-      if (
-        typeof localStorage !== "undefined" &&
-        localStorage.getItem("theme")
-      ) {
-        return localStorage.getItem("theme");
+      if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+        return localStorage.getItem('theme');
       }
-      return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     };
-    const isDark = getThemePreference() === "dark";
-    document.documentElement.classList[isDark ? "add" : "remove"]("dark");
+    const isDark = getThemePreference() === 'dark';
+    document.documentElement.classList[isDark ? 'add' : 'remove']('dark');
 
-    if (typeof localStorage !== "undefined") {
+    if (typeof localStorage !== 'undefined') {
       const observer = new MutationObserver(() => {
-        const isDark = document.documentElement.classList.contains("dark");
-        localStorage.setItem("theme", isDark ? "dark" : "light");
+        const isDark = document.documentElement.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
       });
       observer.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ["class"],
+        attributeFilter: ['class'],
       });
     }
   </script>

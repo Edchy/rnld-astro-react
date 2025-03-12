@@ -1,27 +1,24 @@
-import { useAuth } from "../../context/AuthContext"; // Adjust the import path as needed
+import { useAuth } from '../../context/AuthContext'; // Adjust the import path as needed
 
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = 'http://localhost:3000';
 
 // Default request options
 const defaultOptions: RequestInit = {
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 };
 
 // Helper to add auth token to requests
 const getAuthHeader = (): HeadersInit => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem('token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 /**
  * Base fetch function with error handling
  */
-export async function apiRequest<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
+export async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
 
   // Merge default headers with custom headers
@@ -47,8 +44,7 @@ export async function apiRequest<T>(
       if (response.status === 401 || response.status === 403) {
         // Token is invalid or expired
         throw new Error(
-          data.message ||
-            "Unauthorized: Token is invalid or expired. Try logging in again."
+          data.message || 'Unauthorized: Token is invalid or expired. Try logging in again.'
         );
       }
       throw new Error(data.message || `API error: ${response.status}`);
@@ -56,7 +52,7 @@ export async function apiRequest<T>(
 
     return data as T;
   } catch (error) {
-    console.error("API request failed:", error);
+    console.error('API request failed:', error);
     throw error;
   }
 }
@@ -66,22 +62,22 @@ export async function apiRequest<T>(
  */
 export const api = {
   get: <T>(endpoint: string, options: RequestInit = {}) =>
-    apiRequest<T>(endpoint, { ...options, method: "GET" }),
+    apiRequest<T>(endpoint, { ...options, method: 'GET' }),
 
   post: <T>(endpoint: string, data?: any, options: RequestInit = {}) =>
     apiRequest<T>(endpoint, {
       ...options,
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(data),
     }),
 
   put: <T>(endpoint: string, data?: any, options: RequestInit = {}) =>
     apiRequest<T>(endpoint, {
       ...options,
-      method: "PUT",
+      method: 'PUT',
       body: JSON.stringify(data),
     }),
 
   delete: <T>(endpoint: string, options: RequestInit = {}) =>
-    apiRequest<T>(endpoint, { ...options, method: "DELETE" }),
+    apiRequest<T>(endpoint, { ...options, method: 'DELETE' }),
 };

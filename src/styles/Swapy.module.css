@@ -1,0 +1,7 @@
+[data-swapy-slot][data-swapy-highlighted] {
+  background: rgba(76, 77, 75, 0.2);
+}
+
+[data-swapy-item][data-swapy-dragging] {
+  opacity: 0.6;
+}

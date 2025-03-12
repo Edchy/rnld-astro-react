@@ -1,6 +1,6 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -8,10 +8,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { registerFormSchema } from "./schemas";
-import type { RegisterFormValues } from "./schemas";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { registerFormSchema } from './schemas';
+import type { RegisterFormValues } from './schemas';
 
 interface RegisterFormProps {
   onSubmit: (values: RegisterFormValues) => Promise<void>;
@@ -22,9 +22,9 @@ export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
-      username: "",
-      password: "",
-      confirmPassword: "",
+      username: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
@@ -44,7 +44,7 @@ export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="password"
@@ -58,7 +58,7 @@ export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="confirmPassword"
@@ -72,9 +72,9 @@ export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
             </FormItem>
           )}
         />
-        
+
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Creating Account..." : "Register"}
+          {isLoading ? 'Creating Account...' : 'Register'}
         </Button>
       </form>
     </Form>

@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from 'zod';
 
 export const USERNAME_MIN_LENGTH = 2;
 export const USERNAME_MAX_LENGTH = 15;
@@ -43,7 +43,7 @@ export const registerFormSchema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
+    path: ['confirmPassword'],
   });
 
 export type RegisterFormValues = z.infer<typeof registerFormSchema>;
