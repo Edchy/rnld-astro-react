@@ -128,7 +128,7 @@ export function DisplayUserWorkouts() {
         , you absolute beast! You look fucking good today!
       </div>
       <div className="flex justify-between items-center py-2 mt-10">
-        <p>
+        <p className="sm:text-sm text-xs">
           {workouts.length === 0
             ? 'Add some workouts and start tracking 💪🏋️'
             : 'Here are your workouts:'}
@@ -142,8 +142,8 @@ export function DisplayUserWorkouts() {
         <CardTitle>Your Workouts</CardTitle>
         <CardDescription>Track your progress and stay motivated!</CardDescription>  
       </CardHeader> */}
-        <CardContent>
-          {isLoading && <p className="text-muted-foreground">Loading your workouts...</p>}
+        <CardContent className="px-2 md:px-6">
+          {isLoading && <p className="text-muted-foreground ">Loading your workouts...</p>}
 
           {error && <p className="text-red-500">Error: {error}</p>}
 
@@ -152,15 +152,16 @@ export function DisplayUserWorkouts() {
           )}
 
           {!isLoading && !error && workouts.length > 0 && (
-            <Accordion type="single" collapsible className="w-full mx-4">
+            <Accordion type="single" collapsible className="w-full">
               {workouts.map((workout) => (
                 <AccordionItem value={workout._id} key={workout._id}>
                   <div className="flex items-center justify-between">
-                    <AccordionTrigger className="flex-1 hover:no-underline">
-                      <div className="flex items-center justify-between w-full pr-4">
-                        <span className="font-medium">{workout.name}</span>
+                    <AccordionTrigger className="hover:no-underline sm:w-96">
+                      <div className="flex items-center sm:w-56">
+                        <span className="font-medium sm:w-[100px]">{workout.name}</span>
                         <Badge variant="outline" className="ml-2">
-                          {workout.exercises?.length || 0} exercises
+                          {workout.exercises?.length || 0}{' '}
+                          {workout.exercises?.length === 1 ? 'exercise' : 'exercises'}
                         </Badge>
                       </div>
                     </AccordionTrigger>
