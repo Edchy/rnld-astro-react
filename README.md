@@ -7,3 +7,4 @@
 - HTTP: only
 - Weight units and conversion
 - Save workouts to local storage for more efficient loading (don't need to fetch from server)
+- Store tokens and workouts in the user object in ls - not as separate items (problems logging in two users)

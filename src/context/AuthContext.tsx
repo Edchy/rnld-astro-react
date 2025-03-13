@@ -48,6 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoggedIn(false);
     localStorage.removeItem('userData');
     localStorage.removeItem('token');
+    // localStorage.removeItem('workouts');
   };
 
   return (

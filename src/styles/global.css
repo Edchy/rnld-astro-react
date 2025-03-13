@@ -127,6 +127,11 @@
     font-family: "Array", sans-serif;
   }
 
+  .wrapper {
+    width: min(100% - 3rem, 960px);
+    margin-inline: auto;
+  }
+
 }
 
 /* [data-swapy-highlighted] {

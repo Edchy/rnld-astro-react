@@ -50,6 +50,7 @@ export function DisplayUserWorkouts() {
       const workoutData = await getUserWorkouts(user.username);
       console.log('Workout data:', workoutData);
       setWorkouts(workoutData);
+      // localStorage.setItem('workouts', JSON.stringify(workoutData));
     } catch (err) {
       console.error('Error fetching workouts:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch workouts');
@@ -122,7 +123,7 @@ export function DisplayUserWorkouts() {
     <>
       <div className="text-l mt-10">
         Hello{' '}
-        <span className="font-bold">
+        <span className="font-bold text-pretty">
           {user.username.charAt(0).toUpperCase() + user.username.slice(1)}
         </span>
         , you absolute beast! You look fucking good today!
@@ -134,7 +135,7 @@ export function DisplayUserWorkouts() {
             : 'Here are your workouts:'}
         </p>
         <Button variant={'outline'} onClick={handleNewWorkoutClick}>
-          New workout
+          Add workout
         </Button>
       </div>
       <Card>
@@ -156,7 +157,7 @@ export function DisplayUserWorkouts() {
               {workouts.map((workout) => (
                 <AccordionItem value={workout._id} key={workout._id}>
                   <div className="flex items-center justify-between">
-                    <AccordionTrigger className="hover:no-underline sm:w-96">
+                    <AccordionTrigger className="hover:no-underline cursor-pointer sm:w-96">
                       <div className="flex items-center sm:w-56">
                         <span className="font-medium sm:w-[100px]">{workout.name}</span>
                         <Badge variant="outline" className="ml-2">
@@ -167,6 +168,7 @@ export function DisplayUserWorkouts() {
                     </AccordionTrigger>
 
                     {/* Delete workout button with confirmation */}
+                    <Button variant={'link'}>Go</Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
@@ -203,7 +205,7 @@ export function DisplayUserWorkouts() {
                       <div className="space-y-3 pt-2">
                         {workout.exercises.map((exercise, index) => (
                           <div key={index || index} className="bg-muted/50 p-3 rounded-md">
-                            <h4 className="font-medium text-sm">{exercise.name}</h4>
+                            <h4 className="text-sm uppercase font-bold">{exercise.name}</h4>
                             <div className="grid grid-cols-3 gap-2 mt-2 text-xs text-muted-foreground">
                               <div className="flex flex-col">
                                 <span className="font-bold uppercase text-xs">Sets</span>
@@ -211,11 +213,11 @@ export function DisplayUserWorkouts() {
                               </div>
                               <div className="flex flex-col">
                                 <span className="font-bold uppercase text-xs">Reps</span>
-                                <span>{exercise.reps}</span>
+                                <span className="">{exercise.reps}</span>
                               </div>
                               <div className="flex flex-col">
                                 <span className="font-bold uppercase text-xs">Weight</span>
-                                <span className="text-lg">
+                                <span className="">
                                   {exercise.weight} {weightUnit}
                                 </span>
                               </div>

@@ -44,6 +44,9 @@ export function AccountDialog() {
         localStorage.setItem('token', data.token);
       }
 
+      // const userWithToken = { ...data.user, token: data.token };
+      // login(userWithToken);
+
       login(data.user);
       console.log('Logged in user:', data.user);
       console.log('data:', data);
