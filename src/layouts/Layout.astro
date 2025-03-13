@@ -2,6 +2,8 @@
 import '../styles/global.css';
 import { Toaster } from '@/components/ui/sonner';
 import { AppShell } from '@/components/AppShell';
+const { showWorkouts } = Astro.props;
+console.log(showWorkouts);
 ---
 
 <!doctype html>
@@ -19,7 +21,7 @@ import { AppShell } from '@/components/AppShell';
   </head>
   <body class="min-h-screen">
     <div class="container mx-auto min-h-screen">
-      <AppShell client:load>
+      <AppShell client:load showWorkouts={showWorkouts}>
         <slot />
       </AppShell>
       <slot name="main" />

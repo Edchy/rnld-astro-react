@@ -4,7 +4,14 @@ import UserMenu from './UserMenu';
 import { Toaster } from './ui/sonner';
 import { DisplayUserWorkouts } from '@/components/DisplayUserWorkouts';
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  showWorkouts,
+}: {
+  children: React.ReactNode;
+  showWorkouts?: boolean;
+}) {
+  console.log(showWorkouts);
   return (
     <AuthProvider>
       <header className="muted-foreground py-4 flex justify-between items-center">
@@ -16,7 +23,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <UserMenu />
         </nav>
       </header>
-      <DisplayUserWorkouts />
+      {showWorkouts && <DisplayUserWorkouts />}
 
       {children}
       {/* <Toaster richColors /> */}

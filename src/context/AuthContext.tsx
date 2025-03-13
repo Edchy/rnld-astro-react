@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [weightUnit, setWeightUnit] = useState('lbs');
+  const [weightUnit, setWeightUnit] = useState('kg');
 
   useEffect(() => {
     // Check if user is logged in on mount

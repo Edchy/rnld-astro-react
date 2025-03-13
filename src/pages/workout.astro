@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Swapy from '@/components/Swapy';
 ---
 
-<Layout>
+<Layout showWorkouts={false}>
   <p>inside AppShell</p>
   <Swapy client:visible />
   <div slot="main">
