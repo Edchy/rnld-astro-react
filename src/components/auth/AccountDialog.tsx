@@ -56,7 +56,8 @@ export function AccountDialog() {
       }, 1500);
     } catch (error) {
       console.error('Login error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to login';
+      // const errorMessage = error instanceof Error ? error.message  : 'Failed to login';
+      const errorMessage = 'Network error: Failed to login';
       setError(errorMessage);
       toast.error('Login Failed', {
         description: errorMessage,

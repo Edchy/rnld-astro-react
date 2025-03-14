@@ -1,6 +1,5 @@
-import { useAuth } from '../../context/AuthContext'; // Adjust the import path as needed
-
-const API_BASE_URL = 'http://localhost:3000';
+// const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'https://arnold-n9wx.onrender.com';
 
 // Default request options
 const defaultOptions: RequestInit = {
