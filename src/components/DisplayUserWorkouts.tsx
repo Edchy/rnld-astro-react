@@ -2,6 +2,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import { getUserWorkouts, deleteWorkout } from '@/lib/services/workoutService';
 import { WorkoutFormDialog } from './WorkoutFormDialog';
+import { EditWorkoutDialog } from './EditWorkoutFormDialog';
 
 import type { Workout, Exercise } from '@/lib/services/workoutService';
 import { toast } from 'sonner';
@@ -24,7 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrashIcon } from 'lucide-react';
+import { TrashIcon, PencilIcon } from 'lucide-react';
 import { Button } from './ui/button';
 
 export function DisplayUserWorkouts() {
@@ -33,11 +34,16 @@ export function DisplayUserWorkouts() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
   const [isNewWorkoutDialogOpen, setIsNewWorkoutDialogOpen] = useState(false);
-
+  const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { logout } = useAuth();
   const { weightUnit } = useAuth();
+
+  const handleEditWorkout = (workout: Workout) => {
+    setEditingWorkout(workout);
+    setIsEditDialogOpen(true);
+  };
 
   // Fetch workouts when the component mounts or user changes
   const fetchWorkouts = async () => {
@@ -156,11 +162,13 @@ export function DisplayUserWorkouts() {
             <Accordion type="single" collapsible className="w-full">
               {workouts.map((workout) => (
                 <AccordionItem value={workout._id} key={workout._id}>
-                  <div className="flex items-center justify-between">
-                    <AccordionTrigger className="hover:no-underline cursor-pointer sm:w-96">
-                      <div className="flex items-center sm:w-56">
-                        <span className="font-medium sm:w-[100px]">{workout.name}</span>
-                        <Badge variant="outline" className="ml-2">
+                  {/* <div className="flex items-center justify-between"> */}
+                  <div className="grid grid-cols-[1fr_auto] gap-2 items-center ">
+                    <AccordionTrigger className="hover:no-underline cursor-pointer ">
+                      {/* <div className="flex items-center"> */}
+                      <div className="grid sm:grid-cols-[200px_1fr] gap-0.5 items-center">
+                        <span className="font-medium truncate">{workout.name}</span>
+                        <Badge variant="outline" className="ml-2 hidden md:block w-full">
                           {workout.exercises?.length || 0}{' '}
                           {workout.exercises?.length === 1 ? 'exercise' : 'exercises'}
                         </Badge>
@@ -168,37 +176,46 @@ export function DisplayUserWorkouts() {
                     </AccordionTrigger>
 
                     {/* Delete workout button with confirmation */}
-                    <Button variant={'link'}>Go</Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-muted-foreground hover:text-destructive"
-                          disabled={isDeleting}
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Workout</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete "{workout.name}"? This action cannot be
-                            undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeleteWorkout(workout._id, workout.name)}
-                            className="bg-destructive text-white hover:bg-destructive/90"
+                    {/* <Button variant={'default'}>Go</Button> */}
+                    <div className="">
+                      <Button
+                        className="text-muted-foreground hover:text-destructive "
+                        variant="link"
+                        onClick={() => handleEditWorkout(workout)}
+                      >
+                        <PencilIcon className="h-4 w-4 " />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-destructive "
+                            disabled={isDeleting}
                           >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                            <TrashIcon className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Workout</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{workout.name}"? This action cannot
+                              be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteWorkout(workout._id, workout.name)}
+                              className="bg-destructive text-white hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                   <AccordionContent>
                     {workout.exercises && workout.exercises.length > 0 ? (
@@ -235,6 +252,12 @@ export function DisplayUserWorkouts() {
           )}
         </CardContent>
       </Card>
+      <EditWorkoutDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        workout={editingWorkout}
+        onWorkoutUpdated={fetchWorkouts}
+      />
       <WorkoutFormDialog
         open={isNewWorkoutDialogOpen}
         onOpenChange={setIsNewWorkoutDialogOpen}

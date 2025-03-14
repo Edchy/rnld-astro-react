@@ -49,7 +49,7 @@ export async function createWorkout(workoutData: WorkoutFormData): Promise<Worko
  */
 export async function updateWorkout(
   workoutId: string,
-  workoutData: Partial<Workout>
+  workoutData: WorkoutFormData
 ): Promise<Workout> {
   return api.put<Workout>(`/workouts/${workoutId}`, workoutData);
 }

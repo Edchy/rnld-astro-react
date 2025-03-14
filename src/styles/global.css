@@ -132,12 +132,27 @@
     margin-inline: auto;
   }
 
-}
+  @keyframes circle-in-top-right {
+    from {
+      clip-path: circle(0%);
+    }
 
-/* [data-swapy-highlighted] {
-  background: rgba(155, 255, 255, 0.2);
-}
+    to {
+      clip-path: circle(150% at top right);
+    }
+  }
 
-[data-swapy-dragging] {
-  opacity: 0.9;
-} */
+  @media (prefers-reduced-motion: no-preference) {
+
+    ::view-transition-old(root) {
+      animation: none;
+    }
+
+    ::view-transition-new(root) {
+      animation: 1.5s cubic-bezier(0.25, 1, 0.3, 1) circle-in-top-right forwards;
+    }
+  }
+
+
+
+}

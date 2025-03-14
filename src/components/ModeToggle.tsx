@@ -17,12 +17,31 @@ export function ModeToggle() {
     setThemeState(isDarkMode ? 'dark' : 'theme-light');
   }, []);
 
-  useEffect(() => {
-    const isDark =
-      theme === 'dark' ||
-      (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    document.documentElement.classList[isDark ? 'add' : 'remove']('dark');
-  }, [theme]);
+  // Handle theme changing with animation
+  const setTheme = (newTheme: 'theme-light' | 'dark' | 'system') => {
+    // Check if View Transitions API is supported
+    if ('startViewTransition' in document) {
+      // @ts-ignore - TypeScript doesn't know about startViewTransition yet
+      document.startViewTransition(() => {
+        setThemeState(newTheme);
+
+        const isDark =
+          newTheme === 'dark' ||
+          (newTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+        document.documentElement.classList[isDark ? 'add' : 'remove']('dark');
+      });
+    } else {
+      // Fallback for browsers without View Transitions API
+      setThemeState(newTheme);
+
+      const isDark =
+        newTheme === 'dark' ||
+        (newTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+      (document as Document).documentElement.classList[isDark ? 'add' : 'remove']('dark');
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -34,9 +53,9 @@ export function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setThemeState('theme-light')}>Light</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setThemeState('dark')}>Dark</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setThemeState('system')}>System</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('theme-light')}>Light</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('dark')}>Dark</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('system')}>System</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
